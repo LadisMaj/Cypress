@@ -1,0 +1,34 @@
+///<reference types="cypress"   />
+
+describe("Fill the forms", () => {                                  // tu pracujem s this data ktore som si vytvoril vo fixtures a vytvoril som si pole nie len jedno 
+                                                                    //jedno this data mam pouzite v domacom zadani 9 uloha 3 
+    beforeEach(function(){
+        cy.fixture("dataForTest.json").then(function(data){
+            this.data = data
+        })
+    })
+
+
+
+    it("Inline Form", function(){
+        cy.visit("http://localhost:4200")
+        
+
+        cy.contains("Forms").click()
+        cy.contains("Form Layouts").click()
+
+        cy.wrap(this.data).each((el, index, list)   => {
+            cy.contains("Form without labels").parent().find('[placeholder="Recipients"]').type(el.recipients)     //tu si volam takto všetky hodnoty z pola this.data 
+            cy.contains("Form without labels").parent().find('[placeholder="Subject"]').type(el.subject) 
+            cy.contains("Form without labels").parent().find('[placeholder="Message"]').type(el.message) 
+            
+
+            cy.contains("Form without labels").parent().find("input").then(input => {                              // tu overujem 
+                expect(input[0]).have.value(el.recipients)
+                expect(input[1]).have.value(el.subject)
+                cy.contains("Form without labels").parent().find('[placeholder="Message"]').should("have.value", el.message)    //message nie je input ale textarea preto to takto overujem
+            })
+            cy.contains("Form without labels").parent().find('button').click()
+          })
+       })
+    })
