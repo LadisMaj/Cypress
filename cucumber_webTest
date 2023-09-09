@@ -1,0 +1,76 @@
+///<reference types="cypress" />
+
+import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor"
+
+Given('Test if page is visitable', () =>{
+        cy.viewport(1440, 1200)
+        cy.visit('https://www.dovoznakupov.sk/#')
+
+})
+    
+    
+When('I aceppted cookies', () => {
+        cy.get('#agy-accept').click()
+})
+
+When('I verify element "Otvaracie hodiny". If is visitable', () => {
+        cy.get('.l-section-h.i-cf').contains('Otváracie hodiny').should('exist')
+})   
+
+When('I click on element "Otvaracie hodiny" and verify correct values -> Days', () => {
+        cy.get('.l-section-h.i-cf').contains('Otváracie hodiny').click()  
+    
+        cy.get('tbody th').should( days => {
+    
+            let nameOfDays = days.map((i, el) => {
+            return Cypress.$(el).text()
+            })
+    
+                expect(nameOfDays.get()).to.deep.eq([
+                    "pondelok",
+                    "utorok",  
+                    "streda",   
+                    "štvrtok",   
+                    "piatok",   
+                    "sobota",   
+                    "nedeľa",
+                                 ])    
+                                 })
+})    
+
+When('I ve assert next element called "Dolezite informacie" with right values', () => {
+        cy.get('.wpb_wrapper h3').eq(1).should('contain', 'Dôležité informácie').and('be.visible').click()
+        cy.get('.wpb_wrapper h3').eq(1).parent().find('p').should( p => {
+            let textOfEl = p.map((i, el) => {        
+            return Cypress.$(el).text()        
+     })    
+     expect(textOfEl[0]).to.deep.include([    
+     "Služba Eat Ham delivery je určená výhradne pre fyzické osoby staršie ako 18 rokov."
+         ])    
+     expect(textOfEl[1].trim()).to.deep.include([    
+     "Služba je poskytovaná v rámci Banskej Bystrice a jej okolí, ktoré je špecifikované vo všeobecných obchodných podmienkách a"
+         ])        
+        })
+})    
+
+When('I ve assert next element called "Moznosti a ceny dorucenia" with right values', () => {
+        cy.get('.l-section-h.i-cf').contains('Možnosti a ceny doručenia').should('exist').click()
+        cy.get('.l-section-h.i-cf').contains('Možnosti a ceny doručenia').parent().find('p').eq(0).should('contain', 'Expresné dodanie')
+})
+
+Then('I closed up all elements and information are not visible', () => {
+    
+        cy.get('.l-section-h.i-cf').find('h3').then( el => {
+            cy.wrap(el[0]).click()
+            cy.wrap(el[1]).click()
+            cy.wrap(el[2]).click()
+       
+        })
+
+        cy.get('.l-section-h.i-cf').find('.mega-panel').should( el => {
+            expect(el[0]).not.be.visible
+            expect(el[1]).not.be.visible
+            expect(el[2]).not.be.visible
+        
+        })
+})    
