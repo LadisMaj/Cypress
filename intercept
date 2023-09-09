@@ -1,0 +1,56 @@
+///<reference types="cypress"   />
+
+
+describe("Zadanie 9 - uloha 1 ", () => {
+
+    it("Uloha 1", () => {
+
+        cy.intercept("http://localhost:3000/api/articles?limit=10&offset=0",           
+        {"articles":[
+        {"slug":"article-without-change-q78ras",
+        "title":"Skusame nahradzovat response",
+        "description":"Testujeme Cypress",
+        "body":"Testujeme cypress response",
+        "createdAt":"2023-04-20T12:05:40.169Z",
+        "updatedAt":"2023-04-20T12:05:40.169Z",
+        "tagList":[],
+        "favorited":true,
+        "favoritesCount":1,
+         "author":
+          {"username":"majoros",
+           "bio":"Ladislav sa zmenil na majoros ",
+           "image":"https://static.productionready.io/images/smiley-cyrus.jpg",
+           "following":false}}
+  
+    ],"articlesCount":1})
+ 
+
+    cy.visit("localhost:3000")
+
+    cy.get('[href="/user/login"]').click()
+    cy.get('[placeholder="Email"]').type("ladislav.m@email.sk")      
+    cy.get('[placeholder="Password"]').type("heslo1")
+    cy.get('[type="submit"]').click()
+
+    const titles = ['Article01', 'Article02', 'Article03', 'Article04', 'Article05']    
+    const text = ['Text01', 'Text02', 'Text03', 'Text04', 'Text05']
+    cy.wrap(titles).each(titles => {
+        cy.contains("New Article").click().then( articleInfo => {
+            cy.wrap(articleInfo).get('[placeholder="Article Title"]').clear().type(titles).get("textarea").clear().type("Article about Cypress").get(".btn-primary").click()          
+            })
+        })
+
+  
+        
+    cy.contains("New Article").click()                                             
+    cy.get('[placeholder="Article Title"]').clear().type("Article without change")
+    cy.get('[placeholder="What\'s this article about?"]').type("Without Change")
+    cy.get("textarea").clear().type("Article about Without Change")
+    cy.get(".btn-primary").click()
+    cy.contains("conduit").click()
+    cy.contains("Global Feed").click()
+
+    cy.get(".article-preview").should("contain","Skusame nahradzovat response")     
+    })
+
+  })
