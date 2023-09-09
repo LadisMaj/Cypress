@@ -1,0 +1,39 @@
+let numberOfProducts 
+let count = 0
+class Subcategory{
+
+    assertProducts(data){
+        cy.get(".product-h > a:first-child()").each( function (product) {              
+            data.forEach((element) => {                                                
+                if(product.find("h2").text().trim() == element.Name){                   
+                cy.wrap(product).find(".price > span").should("contain", element.Price) 
+                }              
+            })
+        })
+    }
+    
+    takeOverProducts(labels){
+        cy.get(".product-h").then( product => {                        
+            numberOfProducts = product.length                          
+            if(count < numberOfProducts){                               
+                cy.wrap(product).eq(count).click()                      
+
+                cy.get(".summary h1").then( h1 =>{                      
+                    labels.forEach( label => {                          
+                        if(h1.text().includes(label.Name)){
+                            cy.wrap(h1).should("contain", label.Name)
+                            cy.get(".summary p.price > span").should("contain", label.Price)
+                        }
+                    })
+                })
+                cy.go("back")                                          
+                count += 1                                              
+                this.takeOverProducts(labels)                          
+            }else{
+                count = 0                                               
+                return                                                 
+            }
+        })
+    }
+}
+export default Subcategory
