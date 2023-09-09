@@ -1,0 +1,177 @@
+/// <reference types="cypress" />
+
+import HomePage from "../pageObjects/HomePage"; 
+import ByuIT from "../pageObjects/ByuIT"; 
+import ChangeQuantity from "../pageObjects/ChangeQuantity";
+import Sumary from "../pageObjects/Sumary";
+import BuyProducts from "../pageObjects/BuyProducts";
+
+describe("Domace Zadanie 12 - kategoria alkohol", function(){
+    before("Set up data for alkohol", function(){
+        cy.fixture("Alkohol.json").then( alkohol => {
+            this.data = alkohol
+        })
+    })
+
+    it("Testovaci scenar pre kategoriu alkohol", function() {
+        const homePage = new HomePage()
+        const buyIT = new ByuIT()
+        const changeQuantity = new ChangeQuantity()
+        const sumary = new Sumary()
+        const buyProducts = new BuyProducts()
+
+        cy.visit("https://www.dovoznakupov.sk/")
+        cy.viewport(1440, 1200)
+            
+        homePage.acceptCookies()  
+        buyProducts.alkohol(this.data)
+
+        cy.get(".w-cart-h").should("contain", "4").click()                                  //kontrolujem spravny pocet produktov v hornej ikone košika
+
+        cy.get("tbody").then( body => {                                                     //kontrolujem spravny nazov a cenu produktov v košiku 
+            cy.wrap(body).find("tr").then ( tr => {
+                let i = 0
+                for(let i = 0; i < 3; i++){
+                    cy.wrap(tr[i]).find(".product-name").should("contain", this.data[i].Name)
+                    cy.wrap(tr[i]).find(".product-price").should("contain", this.data[i].Price)
+                }
+         })
+     })
+
+        changeQuantity.change()
+        sumary.sumaryConfirmation()
+        buyIT.fakturaciaNoValidName()
+        buyIT.fakturaciaNoValidCheckbox()
+        buyIT.fakturaciaValid()
+     
+    })
+    })
+
+describe("Domace Zadanie 12 - kategoria víno", function(){
+    before("Set up data for vino", function(){
+        cy.fixture("Vino.json").then( vino => {
+                this.data = vino
+            })
+        })
+    
+    it("Testovaci scenar pre kategoriu Víno", function() {
+        const homePage = new HomePage()
+        const buyIT = new ByuIT()
+        const changeQuantity = new ChangeQuantity()
+        const sumary = new Sumary()
+        const buyProducts = new BuyProducts()
+    
+        cy.visit("https://www.dovoznakupov.sk/")
+        cy.viewport(1440, 1200)
+            
+        homePage.acceptCookies()
+        buyProducts.vino(this.data)
+               
+        cy.get(".w-cart-h").should("contain", "4").click()                                      //kontrolujem spranvy pocet produktov v hornom kosiku
+            cy.get("tbody").then( body => {                                                     //kontrolujem spravny nazov a cenu produktov v kosiku
+            cy.wrap(body).find("tr").then ( tr => {
+                let i = 0
+                for(let i = 0; i < 3; i++){
+                    cy.wrap(tr[i]).find(".product-name").should("contain", this.data[i].Name)
+                    cy.wrap(tr[i]).find(".product-price").should("contain", this.data[i].Price)
+                }
+            })
+        })
+    
+    
+        changeQuantity.change()
+        sumary.sumaryConfirmation()
+        buyIT.fakturaciaNoValidName()
+        buyIT.fakturaciaNoValidCheckbox()
+        buyIT.fakturaciaValid()
+    })
+})
+
+describe("Domace Zadanie 12 - kategoria pivo", function(){
+    before("Set up data for pivo", function(){
+        cy.fixture("Pivo.json").then( pivo => {
+            this.data = pivo
+        })
+    })
+
+    it("Testovaci scenar pre kategoriu pivo", function() {
+        const homePage = new HomePage()
+        const buyIT = new ByuIT()
+        const changeQuantity = new ChangeQuantity()
+        const sumary = new Sumary()
+        const buyProducts = new BuyProducts()
+
+        cy.visit("https://www.dovoznakupov.sk/")
+        cy.viewport(1440, 1200)
+            
+        homePage.acceptCookies()  
+        homePage.navigateToCategory("Pivo")
+        homePage.navigateToSubcategory("Pivo 12")
+        buyProducts.pivo(this.data)
+
+        cy.get(".w-cart-h").should("contain", "6").click()                      //kontrolujem spravny pocet produktov v hornej ikone košika
+
+        cy.get("tbody").then( body => {                                         //kontrolujem spravny nazov a cenu produktov v kosiku 
+            cy.wrap(body).find("tr").then ( tr => {
+                let i = 0
+                for(let i = 0; i < 5; i++){
+                    cy.wrap(tr[i]).find(".product-name").should("contain", this.data[i].Name)
+                    cy.wrap(tr[i]).find(".product-price").should("contain", this.data[i].Price)
+            }
+         })
+     })
+
+        changeQuantity.change()
+        sumary.sumaryConfirmation()
+        buyIT.fakturaciaNoValidName()
+        buyIT.fakturaciaNoValidCheckbox()
+        buyIT.fakturaciaValid()
+  
+    })
+    })
+
+describe("Domace Zadanie 12 - kategoria pochutiny", function(){
+    before("Set up data for pochutiny", function(){
+        cy.fixture("Pochutiny.json").then( Pochutiny => {
+            this.data = Pochutiny
+            })
+        })
+    
+    it("Testovaci scenar pre kategoriu pochutiny", function() {
+        const homePage = new HomePage()
+        const buyIT = new ByuIT()
+        const changeQuantity = new ChangeQuantity()
+        const sumary = new Sumary()
+        const buyProducts = new BuyProducts()
+    
+        cy.visit("https://www.dovoznakupov.sk/")
+        cy.viewport(1440, 1200)
+            
+        homePage.acceptCookies()
+        buyProducts.pochutiny(this.data)  
+            
+cy.get(".page-numbers").contains("2").click()                                                   //kontrolujem funkcnost buttonov na preklikavanie stran
+        cy.get(".page-numbers").contains("1").click()
+        cy.get(".next").should("be.visible").click()
+        cy.get(".prev").should("be.visible").click()
+     
+        cy.get(".w-cart-h").should("contain", "6").click()                                          //kontrolujem spravny pocet produktov 
+    
+        cy.get("tbody").then( body => {                                                             //kontrolujem spravnu cenu a nazov produktov v košiku
+            cy.wrap(body).find("tr").then ( tr => {
+                let i = 0
+                for(let i = 0; i < 5; i++){
+                    cy.wrap(tr[i]).find(".product-name").should("contain", this.data[i].Name)
+                    cy.wrap(tr[i]).find(".product-price").should("contain", this.data[i].Price)
+                }
+            })
+         })
+         
+        changeQuantity.change()
+        sumary.sumaryConfirmation()     
+        buyIT.fakturaciaNoValidName()
+        buyIT.fakturaciaNoValidCheckbox()
+        buyIT.fakturaciaValid()
+      
+        })
+        })
